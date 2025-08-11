@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
     'movie',
     'user',
 ]
@@ -50,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'movie_review.urls'
@@ -137,3 +139,6 @@ REST_FRAMEWORK = {
 # JWT settings
 JWT_ALGORITHM = 'HS256'
 JWT_EXP_HOURS = 24
+
+# Allow all origins for CORS
+CORS_ALLOW_ALL_ORIGINS = True
