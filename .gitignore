@@ -54,3 +54,4 @@ media/
 # Other
 *.swp
 *.swo
+node_modules/
