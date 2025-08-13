@@ -86,3 +86,33 @@ def update_me(request):
 			'phone_number': user.phone_number,
 		})
 	return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_me(request):
+    """Get current authenticated user's info."""
+    user = request.user
+    if not hasattr(user, 'id'):
+        return Response({'detail': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+    serializer = UserSerializer(user)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+def _require_admin(request):
+    user = request.user
+    if not hasattr(user, 'is_admin') or not user.is_admin:
+        return Response({'detail': 'Admin access required'}, status=status.HTTP_403_FORBIDDEN)
+    return None
+
+@api_view(['GET'])
+def admin_list_users(request):
+    admin_check = _require_admin(request)
+    if admin_check:
+        return admin_check
+    users = User.objects.all()
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+
