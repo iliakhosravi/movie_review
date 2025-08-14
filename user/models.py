@@ -2,12 +2,13 @@ from django.db import models
 
 # User model for the application
 class User(models.Model):
-    name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=20)
+    name = models.CharField(max_length=100, null=True, blank=True)
+    last_name = models.CharField(max_length=100, null=True, blank=True)
+    phone_number = models.CharField(max_length=20, null=True, blank=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=100)
     is_admin = models.BooleanField(default=False)
+    favoriteGenre = models.CharField(max_length=200, null=True, blank=True)
 
     def __str__(self):
         return f"{self.name} {self.last_name}"

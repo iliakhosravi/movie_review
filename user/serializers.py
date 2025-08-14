@@ -33,10 +33,6 @@ class LoginSerializer(serializers.Serializer):
 class UpdateUserSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = User
-		fields = [
-			'name',
-			'last_name',
-			'phone_number',
-		]
+		fields = ['name', 'last_name', 'phone_number', 'favoriteGenre']
 
 

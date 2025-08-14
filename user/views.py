@@ -98,6 +98,14 @@ def get_me(request):
     serializer = UserSerializer(user)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def check_name_exists(request):
+    name = request.query_params.get('name')
+    if not name:
+        return Response({'detail': 'Name parameter is required.'}, status=status.HTTP_400_BAD_REQUEST)
+    exists = User.objects.filter(name=name).exists()
+    return Response({'exists': exists}, status=status.HTTP_200_OK)
 
 def _require_admin(request):
     user = request.user
@@ -113,6 +121,18 @@ def admin_list_users(request):
     users = User.objects.all()
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['DELETE'])
+def admin_delete_user(request, pk):
+    admin_check = _require_admin(request)
+    if admin_check:
+        return admin_check
+    try:
+        user = User.objects.get(pk=pk)
+    except User.DoesNotExist:
+        return Response({'detail': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    user.delete()
+    return Response({'detail': 'Deleted'}, status=status.HTTP_204_NO_CONTENT)
 
 
 

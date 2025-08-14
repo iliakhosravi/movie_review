@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from .models import Movie
 from rest_framework import status
 from .serializers import MovieSerializer
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from comments.models import Comment
 from django.db import models
 
@@ -57,7 +57,38 @@ def movie_quality(request, pk):
         quality = "Average"
     else:
         quality = "Poor"
-    return Response({'average_rating': avg, 'quality': quality}, status=status.HTTP_200_OK)
+    return Response({'average_rating': avg, 'gradeByUsersReview': quality}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def suggest_movies(request):
+    favorite_genre = getattr(request.user, 'favoriteGenre', None)
+    if not favorite_genre:
+        return Response({'detail': 'No favorite genre set for user.'}, status=status.HTTP_400_BAD_REQUEST)
+    movies = Movie.objects.filter(genre__icontains=favorite_genre)
+    serializer = MovieSerializer(movies, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['PATCH'])
+@permission_classes([AllowAny])
+def update_movie_rating(request, pk):
+    try:
+        movie = Movie.objects.get(pk=pk)
+    except Movie.DoesNotExist:
+        return Response({'detail': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    rating = request.data.get('rating')
+    if rating is None:
+        return Response({'detail': 'Rating is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        rating = float(rating)
+        movie.rating = rating
+        movie.save()
+        return Response({'rating': movie.rating}, status=status.HTTP_200_OK)
+    except (ValueError, TypeError):
+        return Response({'detail': 'Invalid rating value'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # ----------------------- Admin --------------------------
