@@ -11,7 +11,10 @@ class Movie(models.Model):
     description = models.TextField()
     poster = models.CharField(max_length=300)  # or use ImageField if you want file upload
     videoUrl = models.CharField(max_length=300)
-    releaseDate = models.DateTimeField()
+    releaseDate = models.DateTimeField(null=True, blank=True)
+    trailer = models.CharField(max_length=300, null=True, blank=True)
+    actors = models.CharField(max_length=500, null=True, blank=True)
+    views = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title

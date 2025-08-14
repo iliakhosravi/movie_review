@@ -1,9 +1,13 @@
 from django.shortcuts import render
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .models import Movie
 from rest_framework import status
 from .serializers import MovieSerializer
+from rest_framework.permissions import AllowAny
+from comments.models import Comment
+from django.db import models
+
 
 def _require_admin(request):
     user = request.user
@@ -12,10 +16,52 @@ def _require_admin(request):
     return None
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def movie_list(request):
     movies = Movie.objects.all()
     serializer = MovieSerializer(movies, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def movie_detail(request, pk):
+    try:
+        movie = Movie.objects.get(pk=pk)
+    except Movie.DoesNotExist:
+        return Response({'detail': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+    serializer = MovieSerializer(movie)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def increase_view_count(request, pk):
+    try:
+        movie = Movie.objects.get(pk=pk)
+    except Movie.DoesNotExist:
+        return Response({'detail': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+    movie.views += 1
+    movie.save()
+    return Response({'detail': 'View count increased'}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def movie_quality(request, pk):
+    comments = Comment.objects.filter(movieId=pk)
+    if not comments.exists():
+        return Response({'average_rating': None, 'quality': 'No ratings'}, status=status.HTTP_200_OK)
+    avg = comments.aggregate(models.Avg('rating'))['rating__avg']
+    if avg >= 8:
+        quality = "Excellent"
+    elif avg >= 6:
+        quality = "Good"
+    elif avg >= 4:
+        quality = "Average"
+    else:
+        quality = "Poor"
+    return Response({'average_rating': avg, 'quality': quality}, status=status.HTTP_200_OK)
+
+
+# ----------------------- Admin --------------------------
+
 
 @api_view(['POST'])
 def admin_create_movie(request):
@@ -54,5 +100,6 @@ def admin_delete_movie(request, pk):
         return Response({'detail': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
     movie.delete()
     return Response({'detail': 'Deleted'}, status=status.HTTP_204_NO_CONTENT)
+
 
 

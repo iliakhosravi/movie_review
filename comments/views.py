@@ -1,10 +1,10 @@
 from django.shortcuts import render
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Comment
 from .serializers import CommentSerializer
-
+from rest_framework.permissions import IsAuthenticated
 
 @api_view(['POST'])
 def create_comment(request):
@@ -40,3 +40,10 @@ def admin_delete_comment(request, pk):
         return Response({'detail': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
     comment.delete()
     return Response({'detail': 'Deleted'}, status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_my_comments(request):
+    comments = Comment.objects.filter(userId=request.user)
+    serializer = CommentSerializer(comments, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
