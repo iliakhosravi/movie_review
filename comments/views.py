@@ -77,6 +77,16 @@ def _require_admin(request):
     return None
 
 
+@api_view(['GET'])
+def admin_list_all_comments(request):
+    admin_check = _require_admin(request)
+    if admin_check:
+        return admin_check
+    comments = Comment.objects.all().order_by('-created_at')
+    serializer = CommentSerializer(comments, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 @api_view(['DELETE'])
 def admin_delete_comment(request, pk):
     admin_check = _require_admin(request)

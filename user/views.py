@@ -64,6 +64,8 @@ def login_view(request):
 		'phone_number': user.phone_number,
 		'is_admin': user.is_admin,
 		'token': token,
+		'favoriteGenre': user.favoriteGenre,
+		'bio': user.bio,
 	}
 	return Response(data, status=status.HTTP_200_OK)
 

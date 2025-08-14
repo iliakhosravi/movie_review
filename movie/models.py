@@ -13,7 +13,7 @@ class Movie(models.Model):
     videoUrl = models.CharField(max_length=300)
     releaseDate = models.DateTimeField(null=True, blank=True)
     trailer = models.CharField(max_length=300, null=True, blank=True)
-    actors = models.CharField(max_length=500, null=True, blank=True)
+    cast = models.CharField(max_length=500, null=True, blank=True)
     views = models.IntegerField(default=0)
 
     def __str__(self):
