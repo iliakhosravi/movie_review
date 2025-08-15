@@ -10,6 +10,7 @@ class User(models.Model):
     password = models.CharField(max_length=100)
     is_admin = models.BooleanField(default=False)
     favoriteGenre = models.CharField(max_length=200, null=True, blank=True)
+    avatarUrl = models.CharField(max_length=300, null=True, blank=True)
 
     def __str__(self):
         return f"{self.name} {self.last_name}"

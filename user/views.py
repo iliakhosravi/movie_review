@@ -66,6 +66,7 @@ def login_view(request):
 		'token': token,
 		'favoriteGenre': user.favoriteGenre,
 		'bio': user.bio,
+		'avatarUrl': user.avatarUrl,
 	}
 	return Response(data, status=status.HTTP_200_OK)
 
