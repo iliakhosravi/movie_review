@@ -88,6 +88,9 @@ def update_me(request):
 			'last_name': user.last_name,
 			'email': user.email,
 			'phone_number': user.phone_number,
+			'favoriteGenre': user.favoriteGenre,
+			'bio': user.bio,
+			'avatarUrl': user.avatarUrl,
 		})
 	return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
